@@ -1,0 +1,53 @@
+/* Marketplace theme + animations. Imported in layout.tsx after globals.css. */
+
+/* Facebook blue as the shadcn/ui primary color (buttons, focus rings, bg-primary, text-primary). */
+:root {
+  --primary: #1877f2;
+  --primary-foreground: #ffffff;
+  --ring: #1877f2;
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Mockup-style hatched placeholder for listings without a photo */
+.bg-hatch {
+  background-color: #e7f0fe;
+  background-image: repeating-linear-gradient(135deg, rgb(24 119 242 / 0.16) 0 2px, transparent 2px 10px);
+}
+
+/* Hide scrollbars on horizontal tab rows (still scrollable) */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Cards and panels pop in, like posts on the wall */
+@keyframes pop-in {
+  0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+  60% { opacity: 1; transform: translateY(-2px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-pop-in {
+  animation: pop-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Success checkmark bounce */
+@keyframes check-pop {
+  0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+  60% { opacity: 1; transform: scale(1.15) rotate(5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+.animate-check-pop {
+  animation: check-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop-in,
+  .animate-check-pop {
+    animation: none;
+  }
+}
