@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CircleHelp, LayoutGrid, Tag, Tags } from "lucide-react";
+import { LayoutGrid, Tag, Tags, Wallet } from "lucide-react";
 import { CATEGORIES } from "@/lib/categories";
 import { CATEGORY_ICONS } from "@/components/marketplace/category-icon";
 import { Separator } from "@/components/ui/separator";
@@ -52,16 +52,7 @@ export function Sidebar({ className }: { className?: string }) {
         <div className="mt-2 space-y-0.5">
           <NavItem href="/create" label="Choose listing type" icon={Tag} active={pathname.startsWith("/create")} />
           <NavItem href="/messages" label="Your listings & messages" icon={Tags} active={pathname === "/messages"} />
-          <div
-            className="flex cursor-default items-center gap-3 rounded-lg px-2 py-1.5 text-[15px] text-gray-500"
-            title="Coming soon"
-          >
-            <span className="flex size-9 items-center justify-center rounded-full bg-gray-100">
-              <CircleHelp className="size-[18px]" aria-hidden="true" />
-            </span>
-            Seller help
-            <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs">Soon</span>
-          </div>
+          <NavItem href="/sell/payouts" label="Get paid" icon={Wallet} active={pathname === "/sell/payouts"} />
         </div>
 
         <Separator className="my-3" />

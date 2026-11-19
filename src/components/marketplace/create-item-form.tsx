@@ -127,7 +127,18 @@ export function CreateItemForm() {
         body: JSON.stringify({ ...fields, imageUrl }),
       });
 
-      toast.success("Your listing is live! 🎉");
+      if (listing.buy_now_enabled) {
+        toast.success("Your listing is live with Buy now! 🎉");
+      } else {
+        toast.success("Your listing is live! 🎉", {
+          description: "Connect Stripe so buyers can pay you online.",
+          duration: 10_000,
+          action: {
+            label: "Get paid",
+            onClick: () => router.push(`/sell/payouts?email=${encodeURIComponent(sellerEmail.trim())}`),
+          },
+        });
+      }
       router.push(`/item/${listing.id}`);
     } catch (err) {
       if (err instanceof ApiError && err.fieldErrors) {

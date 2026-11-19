@@ -17,9 +17,9 @@ export class ConfigError extends Error {
 
 export const LISTING_IMAGES_BUCKET = "listing-images";
 
-/** Every listing column except seller_email. */
+/** Every listing column except seller_email and checkout_session_id. */
 export const PUBLIC_LISTING_COLUMNS =
-  "id, title, description, price, category, location, seller_name, image_url, created_at";
+  "id, title, description, price, category, location, seller_name, image_url, created_at, status, buy_now_enabled, reserved_until, sold_at";
 
 function requireEnv(name: string, value: string | undefined): string {
   if (!value) throw new ConfigError(`The server is missing the ${name} environment variable.`);

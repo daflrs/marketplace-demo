@@ -78,3 +78,59 @@ values (
   'listing-images', 'listing-images', true, 4194304,
   array['image/jpeg', 'image/png', 'image/webp']
 );
+
+-- =====================================================================
+-- STRIPE CONNECT (Test 4). Run after the schema above.
+-- =====================================================================
+
+-- One Stripe connected account per seller email (no logins, as the brief allows).
+create table public.seller_accounts (
+  email text primary key check (
+    char_length(email) <= 254 and email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+  ),
+  stripe_account_id text not null unique,
+  details_submitted boolean not null default false,
+  charges_enabled boolean not null default false,
+  payouts_enabled boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.listings
+  add column status text not null default 'available'
+    check (status in ('available', 'pending', 'sold')),
+  add column buy_now_enabled boolean not null default false,
+  add column reserved_until timestamptz,
+  add column checkout_session_id text,
+  add column sold_at timestamptz;
+
+create index listings_seller_email_idx on public.listings (seller_email);
+
+create table public.orders (
+  id uuid primary key default gen_random_uuid(),
+  listing_id uuid references public.listings (id) on delete set null,
+  stripe_session_id text not null unique,
+  stripe_payment_intent_id text,
+  stripe_account_id text not null,
+  seller_email text not null,
+  buyer_email text,
+  listing_title text not null,
+  amount_total integer not null check (amount_total >= 0),
+  application_fee_amount integer not null default 0 check (application_fee_amount >= 0),
+  currency text not null default 'usd',
+  status text not null default 'paid' check (status in ('paid', 'refunded')),
+  created_at timestamptz not null default now()
+);
+
+create index orders_seller_idx on public.orders (seller_email, created_at desc);
+create index orders_listing_idx on public.orders (listing_id);
+
+alter table public.seller_accounts enable row level security;
+alter table public.orders enable row level security;
+revoke all on public.seller_accounts from anon, authenticated;
+revoke all on public.orders from anon, authenticated;
+grant all on public.seller_accounts to service_role;
+grant all on public.orders to service_role;
+
+grant select (status, buy_now_enabled, reserved_until, sold_at)
+  on public.listings to anon, authenticated;

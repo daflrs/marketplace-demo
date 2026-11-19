@@ -18,6 +18,7 @@ A mini Facebook Marketplace: create listings with a photo, browse and search by 
 - **Listing detail:** large photo, details, seller info and "Send seller a message".
 - **Messages:** saved to Supabase, emailed to the seller with Reply-To set to the buyer, and readable on **Your listings & messages** (the envelope icon).
 - Loading skeletons, error boundaries, empty states, toasts, and gentle pop-in animations that respect reduced-motion settings.
+- **Payments (Stripe Connect):** sellers connect Stripe, buyers use Buy now, and the platform keeps a 10% fee. See [PAYMENTS.md](PAYMENTS.md).
 
 See [FEATURES.md](FEATURES.md) for details and [SETUP.md](SETUP.md) to run it.
 

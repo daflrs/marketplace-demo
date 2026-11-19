@@ -4,17 +4,36 @@ import { createAdminClient, createPublicClient, PUBLIC_LISTING_COLUMNS } from ".
 import type { Listing } from "./types";
 import { isUuid } from "./validation";
 
-type ListingRow = Omit<Listing, "price" | "description"> & {
+type ListingRow = Omit<Listing, "price" | "description" | "status"> & {
   price: number | string;
   description: string | null;
+  status: string;
+  reserved_until: string | null;
 };
+
+/** A "pending" hold only lasts until reserved_until; after that the item is available again. */
+function effectiveStatus(row: ListingRow): Listing["status"] {
+  if (row.status === "sold") return "sold";
+  if (row.status === "pending" && row.reserved_until && Date.parse(row.reserved_until) > Date.now()) {
+    return "pending";
+  }
+  return "available";
+}
 
 export function toListing(row: ListingRow): Listing {
   return {
-    ...row,
+    id: row.id,
+    title: row.title,
     description: row.description ?? "",
     price: Number(row.price),
     category: isCategorySlug(row.category) ? row.category : "classifieds",
+    location: row.location,
+    seller_name: row.seller_name,
+    image_url: row.image_url,
+    created_at: row.created_at,
+    status: effectiveStatus(row),
+    buy_now_enabled: Boolean(row.buy_now_enabled),
+    sold_at: row.sold_at ?? null,
   };
 }
 

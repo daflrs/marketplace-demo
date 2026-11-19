@@ -6,6 +6,7 @@ import { ArrowLeft, ImageIcon, MapPin } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BuyNowPanel } from "@/components/marketplace/buy-now-panel";
 import { MessageSellerForm } from "@/components/marketplace/message-seller-form";
 import { TimeAgo } from "@/components/marketplace/time-ago";
 import { getCategoryLabel } from "@/lib/categories";
@@ -71,7 +72,21 @@ async function ItemDetail({ params }: Props) {
       <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-200/70 lg:max-h-[calc(100dvh-8.5rem)] lg:overflow-y-auto">
         <div>
           <h1 className="break-words text-2xl font-bold text-gray-900">{listing.title}</h1>
-          <p className="mt-1 text-xl font-semibold text-gray-900">{formatPrice(listing.price)}</p>
+          <p className="mt-1 flex items-center gap-2 text-xl font-semibold text-gray-900">
+            <span className={listing.status === "sold" ? "text-gray-500 line-through" : undefined}>
+              {formatPrice(listing.price)}
+            </span>
+            {listing.status === "sold" && (
+              <span className="rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
+                Sold
+              </span>
+            )}
+            {listing.status === "pending" && (
+              <span className="rounded-full bg-amber-500 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
+                Pending
+              </span>
+            )}
+          </p>
           <p className="mt-2 text-sm text-gray-500">
             <TimeAgo iso={listing.created_at} prefix="Listed " />
             <br />
@@ -87,6 +102,14 @@ async function ItemDetail({ params }: Props) {
             {getCategoryLabel(listing.category)}
           </Link>
         </div>
+
+        <BuyNowPanel
+          id={listing.id}
+          price={listing.price}
+          status={listing.status}
+          buy_now_enabled={listing.buy_now_enabled}
+          seller_name={listing.seller_name}
+        />
 
         <Separator />
 
@@ -111,9 +134,12 @@ async function ItemDetail({ params }: Props) {
           </div>
         </section>
 
-        <Separator />
-
-        <MessageSellerForm listingId={listing.id} sellerName={listing.seller_name} />
+        {listing.status !== "sold" && (
+          <>
+            <Separator />
+            <MessageSellerForm listingId={listing.id} sellerName={listing.seller_name} />
+          </>
+        )}
       </div>
     </article>
   );

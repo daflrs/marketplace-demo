@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isCategorySlug } from "@/lib/categories";
 import { getListings, toListing } from "@/lib/listings";
+import { getSellerAccount } from "@/lib/payments";
 import { createAdminClient, listingImagePrefix, PUBLIC_LISTING_COLUMNS } from "@/lib/supabase";
 import { hasErrors, isValidEmail, normalizeEmail, validateListing } from "@/lib/validation";
 import { jsonError, NO_STORE, readJsonObject, serverError } from "@/lib/api-response";
@@ -45,6 +46,9 @@ export async function POST(request: NextRequest) {
     }
     if (hasErrors(errors)) return jsonError(400, "Please fix the highlighted fields.", errors);
 
+    // Sellers who already connected Stripe get Buy Now on new listings straight away.
+    const seller = await getSellerAccount(data.sellerEmail);
+
     const { data: row, error } = await createAdminClient()
       .from("listings")
       .insert({
@@ -56,6 +60,7 @@ export async function POST(request: NextRequest) {
         seller_name: data.sellerName,
         seller_email: data.sellerEmail,
         image_url: data.imageUrl,
+        buy_now_enabled: Boolean(seller?.charges_enabled),
       })
       .select(PUBLIC_LISTING_COLUMNS)
       .single();
